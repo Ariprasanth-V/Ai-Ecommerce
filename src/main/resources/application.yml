@@ -1,0 +1,49 @@
+# ============================================================
+# AI-Commerce — Shared Configuration
+# ============================================================
+
+spring:
+  application:
+    name: ai-commerce
+
+  profiles:
+    active: dev
+
+  # JPA defaults (overridden per profile)
+  jpa:
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+
+server:
+  port: 8080
+
+# --- Actuator: expose only health & info ---
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info
+  endpoint:
+    health:
+      show-details: when-authorized
+  info:
+    env:
+      enabled: true
+
+# --- Application Info (exposed via /actuator/info) ---
+info:
+  app:
+    name: ai-commerce
+    description: AI-powered e-commerce platform
+    version: 0.0.1-SNAPSHOT
+
+# --- SpringDoc / Swagger ---
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    tags-sorter: alpha
+    operations-sorter: alpha
+  api-docs:
+    path: /v3/api-docs

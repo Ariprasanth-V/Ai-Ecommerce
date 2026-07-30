@@ -1,0 +1,22 @@
+# ============================================================
+# AI-Commerce — PROD Profile
+# ============================================================
+# All sensitive values MUST come from environment variables.
+# ============================================================
+
+spring:
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+
+logging:
+  level:
+    com.yourname.aicommerce: INFO
+    org.springframework.security: WARN
