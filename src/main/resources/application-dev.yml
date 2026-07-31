@@ -1,26 +1,28 @@
 # ============================================================
 # AI-Commerce — DEV Profile
 # ============================================================
-# Uses H2 in-memory by default so the app starts without Postgres.
-# Switch to Postgres by setting DB_URL, DB_USER, DB_PASSWORD env vars.
+# Uses local PostgreSQL by default (matches docker-compose / standalone container).
+# Override with DB_URL, DB_USER, DB_PASSWORD env vars if needed.
 # ============================================================
 
 spring:
   datasource:
-    url: ${DB_URL:jdbc:h2:mem:aicommerce;DB_CLOSE_DELAY=-1}
-    username: ${DB_USER:sa}
-    password: ${DB_PASSWORD:}
-    driver-class-name: ${DB_DRIVER:org.h2.Driver}
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/aicommerce}
+    username: ${DB_USER:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
 
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: validate
     show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
 
 logging:
   level:

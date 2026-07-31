@@ -2,6 +2,7 @@
 # AI-Commerce — PROD Profile
 # ============================================================
 # All sensitive values MUST come from environment variables.
+# No fallback defaults — the app will fail fast if any are missing.
 # ============================================================
 
 spring:
@@ -11,10 +12,18 @@ spring:
     password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
+  flyway:
+    enabled: true
+    baseline-on-migrate: false
+    locations: classpath:db/migration
+
   jpa:
     hibernate:
       ddl-auto: validate
     show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
 
 logging:
   level:

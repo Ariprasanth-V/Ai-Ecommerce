@@ -1,6 +1,9 @@
 # ============================================================
 # AI-Commerce — TEST Profile
 # ============================================================
+# Uses H2 in-memory. Flyway is disabled; Hibernate manages the schema.
+# Will migrate to Testcontainers + Postgres in a dedicated testing phase.
+# ============================================================
 
 spring:
   datasource:
@@ -8,6 +11,9 @@ spring:
     username: sa
     password:
     driver-class-name: org.h2.Driver
+
+  flyway:
+    enabled: false
 
   jpa:
     hibernate:
