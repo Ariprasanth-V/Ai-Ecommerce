@@ -47,3 +47,16 @@ springdoc:
     operations-sorter: alpha
   api-docs:
     path: /v3/api-docs
+
+# ── JWT ────────────────────────────────────────────────────────────────────────
+# JWT_SECRET must be set via a local .env file (loaded by spring-dotenv) or
+# as a real environment variable. There is NO fallback — the app will fail to
+# start if JWT_SECRET is not present. Generate a secure value with:
+#   $bytes = New-Object byte[] 32
+#   [System.Security.Cryptography.RandomNumberGenerator]::Create().GetBytes($bytes)
+#   [Convert]::ToBase64String($bytes)
+app:
+  jwt:
+    secret: ${JWT_SECRET}
+    access-token-expiry-ms: ${JWT_ACCESS_EXPIRY_MS:900000}       # 15 min default
+    refresh-token-expiry-ms: ${JWT_REFRESH_EXPIRY_MS:604800000}  # 7 days default

@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -35,7 +36,8 @@ public class ProductController {
     }
 
     @GetMapping("/all")
-    @Operation(summary = "List all products including inactive (paginated)")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "List all products including inactive — ADMIN only (paginated)")
     public ResponseEntity<ApiResponse<Page<ProductResponse>>> getAllProducts(
             @PageableDefault(size = 20) Pageable pageable) {
         Page<ProductResponse> products = productService.getAllProducts(pageable);
@@ -75,7 +77,8 @@ public class ProductController {
     }
 
     @PostMapping
-    @Operation(summary = "Create a new product")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Create a new product — ADMIN only")
     public ResponseEntity<ApiResponse<ProductResponse>> createProduct(
             @Valid @RequestBody ProductRequest request) {
         ProductResponse product = productService.createProduct(request);
@@ -84,7 +87,8 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "Update an existing product")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Update an existing product — ADMIN only")
     public ResponseEntity<ApiResponse<ProductResponse>> updateProduct(
             @PathVariable Long id,
             @Valid @RequestBody ProductRequest request) {
@@ -93,7 +97,8 @@ public class ProductController {
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Delete a product")
+    @PreAuthorize("hasRole('ADMIN')")
+    @Operation(summary = "Delete a product — ADMIN only")
     public ResponseEntity<ApiResponse<Void>> deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);
         return ResponseEntity.ok(ApiResponse.noContent());

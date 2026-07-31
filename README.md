@@ -59,6 +59,40 @@ com.yourname.aicommerce
 
 ---
 
+## Environment Variables
+
+The following environment variables are required at runtime:
+
+| Variable | Required | Default | Description |
+|---|---|---|---|
+| `DB_URL` | Dev: No, Prod: Yes | `jdbc:postgresql://localhost:5432/aicommerce` | JDBC URL for PostgreSQL |
+| `DB_USER` | Dev: No, Prod: Yes | `postgres` | Database username |
+| `DB_PASSWORD` | Dev: No, Prod: Yes | `postgres` | Database password |
+| `JWT_SECRET` | **Yes — all profiles** | *(none — fails fast)* | Base64-encoded HS256 signing key, minimum 32 bytes |
+| `JWT_ACCESS_EXPIRY_MS` | No | `900000` (15 min) | Access token lifetime in milliseconds |
+| `JWT_REFRESH_EXPIRY_MS` | No | `604800000` (7 days) | Refresh token lifetime in milliseconds |
+
+### Local development `.env` file
+
+Create a `.env` file in the project root (it is already in `.gitignore`). The
+`spring-dotenv` library loads it automatically at startup:
+
+```bash
+# .env — never commit this file
+JWT_SECRET=<your-base64-secret>
+JWT_ACCESS_EXPIRY_MS=900000
+JWT_REFRESH_EXPIRY_MS=604800000
+```
+
+**Generate a secure JWT secret** (PowerShell):
+```powershell
+$bytes = New-Object byte[] 32
+[System.Security.Cryptography.RandomNumberGenerator]::Create().GetBytes($bytes)
+[Convert]::ToBase64String($bytes)
+```
+
+---
+
 ## Running Locally
 
 ### 1. Clone & build
