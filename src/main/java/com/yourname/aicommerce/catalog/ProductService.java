@@ -8,8 +8,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
 
 /**
  * Service layer for {@link Product} operations.
@@ -24,19 +27,35 @@ public class ProductService {
     private final CategoryRepository categoryRepository;
 
     /**
+     * Lists products filtered by search parameters with pagination and sorting.
+     */
+    public Page<ProductResponse> getProducts(
+            Long categoryId,
+            BigDecimal minPrice,
+            BigDecimal maxPrice,
+            String search,
+            Boolean activeOnly,
+            Pageable pageable) {
+
+        Specification<Product> spec = ProductSpecification.filterProducts(
+                categoryId, minPrice, maxPrice, search, activeOnly);
+
+        return productRepository.findAll(spec, pageable)
+                .map(ProductResponse::fromEntity);
+    }
+
+    /**
      * Lists all active products with pagination.
      */
     public Page<ProductResponse> getActiveProducts(Pageable pageable) {
-        return productRepository.findByActiveTrue(pageable)
-                .map(ProductResponse::fromEntity);
+        return getProducts(null, null, null, null, true, pageable);
     }
 
     /**
      * Lists all products (including inactive) with pagination.
      */
     public Page<ProductResponse> getAllProducts(Pageable pageable) {
-        return productRepository.findAll(pageable)
-                .map(ProductResponse::fromEntity);
+        return getProducts(null, null, null, null, false, pageable);
     }
 
     /**
@@ -60,16 +79,14 @@ public class ProductService {
      * Lists products by category with pagination.
      */
     public Page<ProductResponse> getProductsByCategory(Long categoryId, Pageable pageable) {
-        return productRepository.findByCategoryId(categoryId, pageable)
-                .map(ProductResponse::fromEntity);
+        return getProducts(categoryId, null, null, null, true, pageable);
     }
 
     /**
      * Full-text keyword search across name and description.
      */
     public Page<ProductResponse> searchProducts(String keyword, Pageable pageable) {
-        return productRepository.searchByKeyword(keyword, pageable)
-                .map(ProductResponse::fromEntity);
+        return getProducts(null, null, null, keyword, true, pageable);
     }
 
     /**
@@ -143,13 +160,14 @@ public class ProductService {
     }
 
     /**
-     * Deletes a product by ID.
+     * Soft-deletes a product by setting active=false.
      */
     @Transactional
     public void deleteProduct(Long id) {
         Product product = findProductOrThrow(id);
-        productRepository.delete(product);
-        log.info("Deleted product: {} (id={})", product.getName(), id);
+        product.setActive(false);
+        productRepository.save(product);
+        log.info("Soft-deleted product: {} (id={})", product.getName(), id);
     }
 
     // ── Internal helpers ─────────────────────────────────────────────────

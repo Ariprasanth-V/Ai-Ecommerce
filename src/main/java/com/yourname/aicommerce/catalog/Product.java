@@ -57,6 +57,9 @@ public class Product extends BaseEntity {
     @Builder.Default
     private List<Review> reviews = new ArrayList<>();
 
+    @Version
+    private Long version;
+
     // ── Convenience helpers ──────────────────────────────────────────────
 
     public boolean isInStock() {

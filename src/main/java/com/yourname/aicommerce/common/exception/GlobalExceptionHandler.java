@@ -81,6 +81,21 @@ public class GlobalExceptionHandler {
 
     // ── Database constraint violation (409) ──────────────────────────────
 
+    @ExceptionHandler({
+            org.springframework.orm.ObjectOptimisticLockingFailureException.class,
+            jakarta.persistence.OptimisticLockException.class
+    })
+    public ResponseEntity<ErrorResponse> handleOptimisticLockingFailure(
+            Exception ex,
+            HttpServletRequest request) {
+
+        log.warn("Optimistic locking conflict at {}: {}", request.getRequestURI(), ex.getMessage());
+        return buildResponse(
+                HttpStatus.CONFLICT,
+                "Concurrent modification error — the resource was updated by another request. Please retry.",
+                request);
+    }
+
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ErrorResponse> handleDataIntegrityViolation(
             DataIntegrityViolationException ex,

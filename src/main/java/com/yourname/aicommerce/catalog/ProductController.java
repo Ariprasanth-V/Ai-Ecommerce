@@ -16,6 +16,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+
 /**
  * REST controller for product management.
  */
@@ -28,10 +30,17 @@ public class ProductController {
     private final ProductService productService;
 
     @GetMapping
-    @Operation(summary = "List all active products (paginated)")
-    public ResponseEntity<ApiResponse<Page<ProductResponse>>> getActiveProducts(
+    @Operation(summary = "List products with filtering, sorting, and pagination")
+    public ResponseEntity<ApiResponse<Page<ProductResponse>>> getProducts(
+            @RequestParam(required = false) Long categoryId,
+            @RequestParam(required = false) BigDecimal minPrice,
+            @RequestParam(required = false) BigDecimal maxPrice,
+            @RequestParam(required = false) String search,
+            @RequestParam(required = false, defaultValue = "true") Boolean activeOnly,
             @PageableDefault(size = 20) Pageable pageable) {
-        Page<ProductResponse> products = productService.getActiveProducts(pageable);
+
+        Page<ProductResponse> products = productService.getProducts(
+                categoryId, minPrice, maxPrice, search, activeOnly, pageable);
         return ResponseEntity.ok(ApiResponse.success("Products retrieved", products));
     }
 
@@ -98,7 +107,7 @@ public class ProductController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    @Operation(summary = "Delete a product — ADMIN only")
+    @Operation(summary = "Soft delete a product — ADMIN only")
     public ResponseEntity<ApiResponse<Void>> deleteProduct(@PathVariable Long id) {
         productService.deleteProduct(id);
         return ResponseEntity.ok(ApiResponse.noContent());
