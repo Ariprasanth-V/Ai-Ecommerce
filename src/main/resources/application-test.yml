@@ -23,3 +23,12 @@ spring:
 logging:
   level:
     com.yourname.aicommerce: WARN
+
+app:
+  jwt:
+    secret: dGVzdHNlY3JldGtleXRlc3RzZWNyZXRrZXl0ZXN0c2VjcmV0a2V5dGVzdHNlY3JldGtleQ==
+  razorpay:
+    key-id: rzp_test_dummy
+    key-secret: test_key_secret_dummy
+    webhook-secret: test_webhook_secret_dummy
+

@@ -71,6 +71,9 @@ The following environment variables are required at runtime:
 | `JWT_SECRET` | **Yes — all profiles** | *(none — fails fast)* | Base64-encoded HS256 signing key, minimum 32 bytes |
 | `JWT_ACCESS_EXPIRY_MS` | No | `900000` (15 min) | Access token lifetime in milliseconds |
 | `JWT_REFRESH_EXPIRY_MS` | No | `604800000` (7 days) | Refresh token lifetime in milliseconds |
+| `RAZORPAY_KEY_ID` | **Yes — all profiles** | *(none — fails fast)* | Razorpay Sandbox/Test Key ID (e.g. `rzp_test_...`) |
+| `RAZORPAY_KEY_SECRET` | **Yes — all profiles** | *(none — fails fast)* | Razorpay Sandbox/Test Key Secret |
+| `RAZORPAY_WEBHOOK_SECRET` | **Yes — all profiles** | *(none — fails fast)* | Razorpay Webhook Secret for HMAC-SHA256 signature verification |
 
 ### Local development `.env` file
 
@@ -82,7 +85,67 @@ Create a `.env` file in the project root (it is already in `.gitignore`). The
 JWT_SECRET=<your-base64-secret>
 JWT_ACCESS_EXPIRY_MS=900000
 JWT_REFRESH_EXPIRY_MS=604800000
+RAZORPAY_KEY_ID=rzp_test_TKXIx4TOtoqqfN
+RAZORPAY_KEY_SECRET=23Yr7Bb0PQmaqd55zg8JwkMc
+RAZORPAY_WEBHOOK_SECRET=rzp_whsec_test_1234567890
 ```
+
+---
+
+## Razorpay Payment Integration & Testing (Curl Commands)
+
+### 1. Create Razorpay Payment Order (Authenticated)
+
+```bash
+curl -X POST http://localhost:8080/api/v1/payments/create-order/1 \
+  -H "Authorization: Bearer <YOUR_CUSTOMER_JWT_TOKEN>"
+```
+
+**Response**:
+```json
+{
+  "success": true,
+  "message": "Razorpay payment order created successfully",
+  "data": {
+    "orderId": 1,
+    "razorpayOrderId": "order_PZ123456789",
+    "amount": 599.97,
+    "currency": "INR",
+    "keyId": "rzp_test_TKXIx4TOtoqqfN"
+  }
+}
+```
+
+### 2. Simulate Razorpay Webhook Call (`payment.captured`)
+
+Compute HMAC-SHA256 of the JSON body using your `RAZORPAY_WEBHOOK_SECRET` and pass it in the `X-Razorpay-Signature` header:
+
+```bash
+# Example payload
+PAYLOAD='{"event":"payment.captured","payload":{"payment":{"entity":{"id":"pay_test_999","order_id":"order_PZ123456789","amount":59997,"notes":{"orderId":"1"}}}}}'
+
+# Compute signature (bash/openssl)
+SIG=$(echo -n "$PAYLOAD" | openssl dgst -sha256 -hmac "rzp_whsec_test_1234567890" | sed 's/^.*= //')
+
+curl -X POST http://localhost:8080/api/v1/payments/webhook \
+  -H "Content-Type: application/json" \
+  -H "X-Razorpay-Signature: $SIG" \
+  -d "$PAYLOAD"
+```
+
+### 3. Simulate Razorpay Webhook Call (`payment.failed`)
+
+```bash
+PAYLOAD='{"event":"payment.failed","payload":{"payment":{"entity":{"id":"pay_test_888","order_id":"order_PZ123456789","amount":59997,"notes":{"orderId":"1"}}}}}'
+
+SIG=$(echo -n "$PAYLOAD" | openssl dgst -sha256 -hmac "rzp_whsec_test_1234567890" | sed 's/^.*= //')
+
+curl -X POST http://localhost:8080/api/v1/payments/webhook \
+  -H "Content-Type: application/json" \
+  -H "X-Razorpay-Signature: $SIG" \
+  -d "$PAYLOAD"
+```
+
 
 **Generate a secure JWT secret** (PowerShell):
 ```powershell

@@ -60,6 +60,10 @@ app:
     secret: ${JWT_SECRET}
     access-token-expiry-ms: ${JWT_ACCESS_EXPIRY_MS:900000}       # 15 min default
     refresh-token-expiry-ms: ${JWT_REFRESH_EXPIRY_MS:604800000}  # 7 days default
+  razorpay:
+    key-id: ${RAZORPAY_KEY_ID:rzp_test_dummy}
+    key-secret: ${RAZORPAY_KEY_SECRET:test_key_secret_dummy}
+    webhook-secret: ${RAZORPAY_WEBHOOK_SECRET:test_webhook_secret_dummy}
 
 spring.kafka:
   bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
@@ -71,4 +75,6 @@ spring.kafka:
     value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
     properties:
       spring.json.trusted.packages: "*"
+
+
 

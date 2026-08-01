@@ -63,9 +63,11 @@ public class SecurityConfig {
                 // ── Public read-only catalog ──────────────────────────────
                 .requestMatchers(HttpMethod.GET, "/api/v1/products/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/categories/**").permitAll()
-                // ── Orders & Cart ─────────────────────────────────────────
+                // ── Orders, Cart & Payments ───────────────────────────────
                 .requestMatchers("/api/v1/cart/**").authenticated()
                 .requestMatchers("/api/v1/orders/**").authenticated()
+                .requestMatchers("/api/v1/payments/webhook").permitAll()
+                .requestMatchers("/api/v1/payments/**").authenticated()
                 // ── Everything else requires authentication ───────────────
                 .anyRequest().authenticated()
             )

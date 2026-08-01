@@ -62,6 +62,14 @@
             <artifactId>spring-kafka</artifactId>
         </dependency>
 
+        <!-- Razorpay Java SDK -->
+        <dependency>
+            <groupId>com.razorpay</groupId>
+            <artifactId>razorpay-java</artifactId>
+            <version>1.4.7</version>
+        </dependency>
+
+
         <!-- Data / JPA -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

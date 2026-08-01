@@ -29,3 +29,10 @@ logging:
   level:
     com.yourname.aicommerce: INFO
     org.springframework.security: WARN
+
+app:
+  razorpay:
+    key-id: ${RAZORPAY_KEY_ID}
+    key-secret: ${RAZORPAY_KEY_SECRET}
+    webhook-secret: ${RAZORPAY_WEBHOOK_SECRET}
+
